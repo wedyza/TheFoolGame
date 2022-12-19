@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -98,17 +99,11 @@ namespace TheFoolGame
         string name;
         BoxOfCards cardsOnHand;
 
-        public Card[] Move(params int[] numbersOfCard)
+        public Card Move(int numbersOfCard)
         {
-            int moveLength = numbersOfCard.Length;
-            var thatCards = new Card[moveLength];
-            for (int i = 0; i < moveLength; i++)
-            {
-                var card = CardsOnHand.Cards[numbersOfCard[i]];
-                thatCards[i] = card;
-                CardsOnHand.Cards.Remove(card);
-            }
-            return thatCards;
+            var thatCard = cardsOnHand.Cards[numbersOfCard-1];
+            CardsOnHand.Cards.Remove(thatCard);
+            return thatCard;
         }
 
         public void GetCards(BoxOfCards takenCards)
@@ -166,21 +161,20 @@ namespace TheFoolGame
     {
         Deck deck;
 
-        BoxOfCards move1;
-        BoxOfCards move2;
+        MoveCards player1Moves;
+        MoveCards player2Moves;
 
         BoxOfCards beaten;
 
         public Deck Deck { get; set; }
-        public BoxOfCards Move1 { get; set; }
-        public BoxOfCards Move2 { get; set; }
+        public MoveCards Player1Moves { get; set; }
+        public MoveCards Player2Moves { get; set; }
         public BoxOfCards Beaten { get; set; }
+        
 
         public Table()
         {
             Deck = new Deck();
-            Move1 = new BoxOfCards();
-            Move2 = new BoxOfCards();
             Beaten = new BoxOfCards();
         }
     }
@@ -197,21 +191,26 @@ namespace TheFoolGame
             cards = new List<Card>();
         }
 
-        public BoxOfCards(params Card[] theCards)
+        public void AddCards(Card[] theCards)
         {
             cards = new List<Card>();
             foreach (var i in theCards)
                 cards.Add(i);
         }
 
-        public override string ToString()
+        public BoxOfCards(params Card[] theCards)
         {
-            var sb = new StringBuilder();
+            AddCards(theCards);
+        }
+
+        public void ShowCards()
+        {
+            var cardNum = 0;
             foreach (var i in Cards)
             {
-                sb.Append(string.Format($" {i}", i));
+                cardNum++;
+                Console.WriteLine($"{cardNum}-[{i}]");
             }
-            return sb.ToString();
         }
     }
 
@@ -245,6 +244,28 @@ namespace TheFoolGame
                 finalDeck.Push(i);
 
             Cards = finalDeck;
+        }
+    }
+
+    public class MoveCards
+    {
+        List<Card> moves;
+        Player connectedPlayer;
+
+        public List<Card> Moves { get; set; }
+        public Player ConnectedPlayer { get; set; }
+
+        public string ShowCards()
+        {
+            string returning = "";
+            foreach (var i in moves)
+                returning += string.Format($"[{i}] ");
+            return returning;
+        }
+        public MoveCards(Player player)
+        {
+            moves = new List<Card>();
+            connectedPlayer = player;
         }
     }
 }
